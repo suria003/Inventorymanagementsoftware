@@ -1,0 +1,279 @@
+<nav style="position:fixed;top:0;left:0;right:0;width:100%;background:#3498db;padding:15px;display:flex;justify-content:space-between;align-items:center;box-sizing:border-box;z-index:110;">
+    <header style="color:#fff;font-size:20px;font-weight:bold;">Inventory</header>
+
+    <ul style="list-style:none;margin:0;padding:0;display:flex;gap:12px;align-items:center;">
+        {% if session.get("user") %}
+        <li id="profile-btn" style="cursor:pointer;display:flex;align-items:center;gap:6px;padding:6px;border-radius:6px;transition:background .18s;">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="#fff" aria-hidden="true" focusable="false">
+                <path
+                    d="M480-480q81 0 169-16.5T800-540v400q-60 27-146 43.5T480-80q-88 0-174-16.5T160-140v-400q63 27 151 43.5T480-480Zm0-400q66 0 113 47t47 113q0 66-47 113t-113 47q-66 0-113-47t-47-113q0-66 47-113t113-47Z" />
+            </svg>
+            <span style="color:#fff;font-weight:600;font-size:14px">Profile</span>
+        </li>
+        {% else %}
+        <li><a href="/login" style="background:white;color:#000;padding:8px 16px;text-decoration:none;border-radius:6px;font-weight:500;transition:0.3s;">Login
+                Warehouse</a></li>
+        <li><a href="/create" style="background:white;color:#000;padding:8px 16px;text-decoration:none;border-radius:6px;font-weight:500;transition:0.3s;">Create
+                Warehouse</a></li>
+        {% endif %}
+    </ul>
+
+    <div id="md-overlay" style="position:fixed;inset:0;background:rgba(8,12,20,0.35);opacity:0;pointer-events:none;transition:opacity .28s ease;z-index:105;">
+    </div>
+
+    <div id="md-panel" style="
+       position:fixed;
+       top:0;
+       right:-380px;
+       height:100vh;
+       width:320px;
+       max-width:calc(100% - 24px);
+       padding:24px;
+       background:#ffffff;
+       border-radius:12px 0 0 12px;
+       box-shadow:0 20px 60px rgba(16,24,40,0.18);
+       font-family:Segoe UI, Roboto, system-ui, -apple-system, Arial;
+       color:#102233;
+       overflow:auto;
+       transition:right .36s cubic-bezier(.2,.9,.2,1),transform .36s cubic-bezier(.2,.9,.2,1);
+       z-index:120;
+     ">
+        <div style="display:flex;justify-content:flex-end;">
+            <button id="md-close" aria-label="Close details" style="background:transparent;border:0;padding:6px;border-radius:8px;cursor:pointer;line-height:0;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#6b7b86"
+                    aria-hidden="true">
+                    <path
+                        d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12l-4.89 4.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4z" />
+                </svg>
+            </button>
+        </div>
+
+        <div style="margin-top:8px;">
+            <ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px;">
+                <li id="md-name" style="display:flex;align-items:center;gap:12px;">
+                    <div style="width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,#eef6ff,#e6f4ea);display:flex;align-items:center;justify-content:center;font-weight:700;color:#2c3e50;font-size:18px;flex:0 0 56px;">
+                        <span id="md-initial" style="user-select:none;"></span>
+                    </div>
+                    <div style="display:flex;flex-direction:column;min-width:0;">
+                        <span id="md-display-name" style="font-size:16px;font-weight:700;line-height:1;color:#102233;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+                        <span style="font-size:13px;color:#6b7a86;margin-top:4px">Warehouse</span>
+                    </div>
+                </li>
+
+                <li style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;background:#fbfdff;">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20" fill="#2c3e50" style="flex:0 0 20px;opacity:.9">
+                        <path
+                            d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480v58q0 59-40.5 100.5T740-280q-35 0-66-15t-52-43q-29 29-65.5 43.5T480-280q-83 0-141.5-58.5T280-480q0-83 58.5-141.5T480-680q83 0 141.5 58.5T680-480v58q0 26 17 44t43 18q26 0 43-18t17-44v-58q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93h200v80H480Zm0-280q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35Z" />
+                    </svg>
+
+                    <div style="display:flex;flex-direction:column;min-width:0;">
+                        <span id="md-username" style="font-weight:600;color:#133041;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+                        <span style="font-size:12px;color:#6b7a86;margin-top:4px">Account</span>
+                    </div>
+                </li>
+
+                <li style="display:flex;align-items:center;gap:12px;padding:10px;border-radius:10px;background:#fff9f4;">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20" fill="#b25a00" style="flex:0 0 20px;opacity:.95">
+                        <path
+                            d="M480-480q33 0 56.5-23.5T560-560q0-33-23.5-56.5T480-640q-33 0-56.5 23.5T400-560q0 33 23.5 56.5T480-480Zm0 400Q319-217 239.5-334.5T160-552q0-150 96.5-239T480-880q127 0 223.5 89T800-552q0 100-79.5 217.5T480-80Z" />
+                    </svg>
+
+                    <div style="display:flex;flex-direction:column;min-width:0;">
+                        <span id="md-location" style="font-weight:600;color:#7a4f00;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+                        <span style="font-size:12px;color:#a07b4b;margin-top:4px">Location</span>
+                    </div>
+                </li>
+
+                <!-- MyProduct, MyOrders, Report -->
+                <ul style="list-style:none;margin-top:35px;padding:0;display:flex;flex-direction:column;gap:12px;">
+
+                    <!-- Home -->
+                    <a href="/" style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;background:linear-gradient(90deg,#f0fbff,#f7fff6);box-shadow:inset 0 1px 0 rgba(255,255,255,0.6);cursor: pointer;text-decoration: none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#000">
+                            <path
+                                d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z" />
+                        </svg>
+
+                        <div style="display:flex;flex-direction:column;min-width:0;">
+                            <span id="md-product" style="font-weight:700;color:#000;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Home</span>
+                        </div>
+                    </a>
+
+                    <!-- Product -->
+                    <a href="/product" style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;background:linear-gradient(90deg,#f0fbff,#f7fff6);box-shadow:inset 0 1px 0 rgba(255,255,255,0.6);cursor: pointer;text-decoration: none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#0B5E4B">
+                            <path
+                                d="M200-640v440h560v-440H640v320l-160-80-160 80v-320H200Zm0 520q-33 0-56.5-23.5T120-200v-499q0-14 4.5-27t13.5-24l50-61q11-14 27.5-21.5T250-840h460q18 0 34.5 7.5T772-811l50 61q9 11 13.5 24t4.5 27v499q0 33-23.5 56.5T760-120H200Zm16-600h528l-34-40H250l-34 40Zm184 80v190l80-40 80 40v-190H400Zm-200 0h560-560Z" />
+                        </svg>
+
+                        <div style="display:flex;flex-direction:column;min-width:0;">
+                            <span id="md-product" style="font-weight:700;color:#0B5E4B;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Product</span>
+                            <span style="font-size:12px;color:#4B6B6A;margin-top:4px">Product details</span>
+                        </div>
+                    </a>
+
+                    <!-- Order -->
+                    <a href="/order" style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;background:linear-gradient(90deg,#fff9f0,#fff7f3);box-shadow:inset 0 1px 0 rgba(255,255,255,0.6);cursor: pointer;text-decoration: none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#9A3D05">
+                            <path
+                                d="M280-80q-33 0-56.5-23.5T200-160q0-33 23.5-56.5T280-240q33 0 56.5 23.5T360-160q0 33-23.5 56.5T280-80Zm400 0q-33 0-56.5-23.5T600-160q0-33 23.5-56.5T680-240q33 0 56.5 23.5T760-160q0 33-23.5 56.5T680-80ZM246-720l96 200h280l110-200H246Zm-38-80h590q23 0 35 20.5t1 41.5L692-482q-11 20-29.5 31T622-440H324l-44 80h480v80H280q-45 0-68-39.5t-2-78.5l54-98-144-304H40v-80h130l38 80Zm134 280h280-280Z" />
+                        </svg>
+
+                        <div style="display:flex;flex-direction:column;min-width:0;">
+                            <span id="md-order" style="font-weight:700;color:#9A3D05;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Order</span>
+                            <span style="font-size:12px;color:#8A5A3F;margin-top:4px">Track product & view orders</span>
+                        </div>
+                    </a>
+
+                    <!-- Report -->
+                    <a href="/report" style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;background:linear-gradient(90deg,#f8fbff,#f6f9ff);box-shadow:inset 0 1px 0 rgba(255,255,255,0.6);cursor: pointer;text-decoration: none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#153E87">
+                            <path d="M640-160v-280h160v280H640Zm-240 0v-640h160v640H400Zm-240 0v-440h160v440H160Z" />
+                        </svg>
+
+                        <div style="display:flex;flex-direction:column;min-width:0;">
+                            <span id="md-report" style="font-weight:700;color:#153E87;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Report</span>
+                            <span style="font-size:12px;color:#45689E;margin-top:4px">Analytics & exports</span>
+                        </div>
+                    </a>
+
+                </ul>
+
+            </ul>
+
+            <p id="md-error-msg" style="text-align:center;font-size:14px;font-weight:700;margin-top:14px;padding:10px 12px;border-radius:10px;min-height:20px;display:none;background:#fff1f0;color:#9b2b2b;">
+            </p>
+
+            <a id="logout-link" href="/logout" style="display:inline-flex;align-items:center;gap:10px;padding:10px 16px;border-radius:8px;background:linear-gradient(180deg,#ff6b6b,#e74c3c);color:#fff;text-decoration:none;font-weight:700;font-family:Segoe UI,Roboto,system-ui;box-shadow:0 8px 22px rgba(231,76,60,0.18);transition:transform .16s ease,box-shadow .16s ease;cursor:pointer;position:absolute;left: 10%;bottom: 10%;"
+                role="button" aria-label="Logout">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M16 17l5-5-5-5" stroke="#fff" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                    <path d="M21 12H9" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M13 19H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h7" stroke="#fff" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                </svg> Logout
+            </a>
+
+        </div>
+
+        <!-- PROFILE JS API -->
+        <script>
+            async function profile() {
+                const errElem = document.getElementById('md-error-msg');
+                if (errElem) {
+                    errElem.style.display = 'none';
+                    errElem.textContent = '';
+                }
+
+                try {
+                    const API = "http://127.0.0.1:3000/profile";
+                    const response = await fetch(API, {
+                        method: 'GET',
+                        credentials: 'include'
+                    });
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        const initialEl = document.getElementById('md-initial');
+                        const displayNameEl = document.getElementById('md-display-name');
+                        const usernameEl = document.getElementById('md-username');
+                        const locationEl = document.getElementById('md-location');
+
+                        const user = result.user || {};
+
+                        if (initialEl) initialEl.innerText = user.name ? user.name[0] : '';
+                        if (displayNameEl) displayNameEl.innerText = user.name || '';
+                        if (usernameEl) usernameEl.innerText = user.username || '';
+                        if (locationEl) locationEl.innerText = user.location || '';
+
+                    } else if (response.status === 404) {
+                        if (errElem) {
+                            errElem.style.display = 'block';
+                            errElem.textContent = result.message || 'Profile not found';
+                        }
+                    } else {
+                        if (errElem) {
+                            errElem.style.display = 'block';
+                            errElem.textContent = result.message || `Request failed (${response.status})`;
+                        }
+                    }
+                } catch (err) {
+                    if (errElem) {
+                        errElem.style.display = 'block';
+                        errElem.textContent = err.message || 'An unexpected error occurred';
+                    }
+                    console.error('Profile fetch error:', err);
+                }
+            }
+
+            window.addEventListener('load', profile);
+        </script>
+
+        <script>
+            (function() {
+                const profileBtn = document.getElementById('profile-btn');
+                const panel = document.getElementById('md-panel');
+                const overlay = document.getElementById('md-overlay');
+                const closeBtn = document.getElementById('md-close');
+
+                const PANEL_HIDDEN_RIGHT = '-380px';
+                const PANEL_VISIBLE_RIGHT = '0px';
+
+                function showPanel() {
+                    panel.style.right = PANEL_VISIBLE_RIGHT;
+                    panel.style.transform = 'translateY(0)';
+                    overlay.style.opacity = '1';
+                    overlay.style.pointerEvents = 'auto';
+                    profileBtn.setAttribute('aria-expanded', 'true');
+                    panel.setAttribute('aria-hidden', 'false');
+                    document.body.style.overflow = 'hidden';
+                }
+
+                function hidePanel() {
+                    panel.style.right = PANEL_HIDDEN_RIGHT;
+                    panel.style.transform = 'translateY(0)';
+                    overlay.style.opacity = '0';
+                    overlay.style.pointerEvents = 'none';
+                    profileBtn.setAttribute('aria-expanded', 'false');
+                    panel.setAttribute('aria-hidden', 'true');
+                    document.body.style.overflow = '';
+                }
+
+                if (profileBtn) {
+                    profileBtn.addEventListener('click', (e) => {
+                        const isOpen = profileBtn.getAttribute('aria-expanded') === 'true';
+                        if (isOpen) hidePanel();
+                        else showPanel();
+                    });
+
+                    profileBtn.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            profileBtn.click();
+                        } else if (e.key === 'Escape') hidePanel();
+                    });
+                }
+
+                overlay.addEventListener('click', hidePanel);
+
+                if (closeBtn) closeBtn.addEventListener('click', hidePanel);
+
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') hidePanel();
+                });
+
+                window.addEventListener('resize', () => {
+                    if (window.innerWidth < 420) {
+                        panel.style.width = '100%';
+                        panel.style.right = panel.style.right === PANEL_VISIBLE_RIGHT ? '0px' : PANEL_HIDDEN_RIGHT;
+                    } else {
+                        panel.style.width = '320px';
+                    }
+                });
+
+                if (profileBtn) profileBtn.setAttribute('aria-expanded', 'false');
+                panel.setAttribute('aria-hidden', 'true');
+            })();
+        </script>
+</nav>

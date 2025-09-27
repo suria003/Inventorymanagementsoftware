@@ -1,0 +1,289 @@
+<style>
+    body {
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        background-color: #f5f7fa;
+    }
+    
+    #product-page {
+        display: none;
+        width: 100%;
+        height: 100%;
+        padding: 40px;
+        box-sizing: border-box;
+        overflow-y: auto;
+    }
+    
+    nav {
+        width: 100%;
+        padding-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    nav h2 {
+        margin: 0;
+        color: #2c3e50;
+        font-size: 2rem;
+        font-weight: 700;
+        letter-spacing: 0.6px;
+    }
+    
+    nav ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        gap: 16px;
+    }
+    
+    nav button {
+        padding: 10px 20px;
+        background-color: #007BFF;
+        color: #fff;
+        border: none;
+        border-radius: 20px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+    
+    nav button:hover {
+        background-color: #0056b3;
+    }
+    /* Product Table */
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background-color: #fff;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
+    
+    thead {
+        background: linear-gradient(90deg, #007BFF, #0056d2);
+        color: white;
+    }
+    
+    th,
+    td {
+        padding: 16px;
+        font-size: 1rem;
+        font-weight: 500;
+        border-bottom: 1px solid #eee;
+    }
+    
+    td {
+        color: #2c3e50;
+    }
+    
+    td:nth-child(2) {
+        color: #27ae60;
+        font-weight: 600;
+    }
+    
+    td:nth-child(3) {
+        color: #34495e;
+        font-weight: 600;
+    }
+    
+    td:last-child {
+        text-align: center;
+    }
+    
+    .edit-btn {
+        padding: 8px 18px;
+        background: linear-gradient(180deg, #28a745, #218838);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+    }
+    
+    .edit-btn:hover {
+        background: #218838;
+    }
+    /* Add Product Panel */
+    
+    #add-product-panel {
+        position: fixed;
+        top: 0;
+        left: -500px;
+        height: 100vh;
+        min-width: 420px;
+        max-width: 480px;
+        background-color: #ffffff;
+        box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
+        padding: 32px;
+        box-sizing: border-box;
+        transition: left 0.3s ease;
+        z-index: 1000;
+    }
+    
+    #add-product-panel header {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2c3e50;
+        margin-bottom: 24px;
+    }
+    
+    #add-product-panel label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    #add-product-panel input {
+        width: 90%;
+        padding: 10px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 0;
+        font-size: 1rem;
+    }
+    
+    #add-product-panel button[type="submit"] {
+        padding: 10px 20px;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 0;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+    }
+    
+    #add-product-panel button[type="submit"]:hover {
+        background-color: #0056b3;
+    }
+    
+    .inline-form {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    
+    .inline-form input[type="text"],
+    .inline-form input[type="number"] {
+        padding: 5px 8px;
+        font-size: 14px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+    }
+    
+    .inline-form button {
+        padding: 5px 10px;
+        background-color: #3498db;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    
+    .inline-form button:hover {
+        background-color: #2980b9;
+    }
+    
+    .edit-btn {
+        padding: 5px 10px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+</style>
+
+<section id="product-page">
+    <nav>
+        <h2>📦 Product List</h2>
+        <ul>
+            <li>
+                <button onclick="togglePanel()">Add Product</button>
+            </li>
+        </ul>
+    </nav>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr>
+                <td>{{ product.product_Name }}</td>
+                <td>₹{{ product.product_Price }}</td>
+                <td>{{ product.product_Quantity }}</td>
+                <td>
+                    <a href="{{ url_for('editProduct', productname=product.product_Name) }}" class="edit-btn">✏ Edit</a>
+                </td>
+            </tr>
+
+
+            {% else %}
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 20px; color: #888;">No products available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+
+    {% if message %}
+    <div style="position: absolute;left: 50%;top: 50%;transform: translate(-50%, -50%); margin:20px auto; padding:15px; max-width:600px;
+            background:#ffe6e6; color:#c0392b; border:1px solid #e74c3c;
+            border-radius:8px; font-family:Arial, sans-serif;z-index: 1000;">
+        {{ message }}
+    </div>
+    {% endif %}
+
+</section>
+
+<!-- Add Product Panel -->
+<div id="add-product-panel">
+    <header>Add Product</header>
+    <p id="error-msg" style="text-align:center; font-size:14px; font-weight:bold; margin-top:16px; padding:8px 12px; border-radius:8px; min-height:20px; transition:0.3s; display: none;">
+    </p>
+    <form id="product-form">
+        <label>Product Name</label>
+        <input type="text" id="product-name" placeholder="Product Name" required />
+
+        <label>Product Price</label>
+        <input type="number" id="product-price" placeholder="Single product price" required />
+
+        <label>Product Quantity</label>
+        <input type="number" id="product-quantity" placeholder="total product Quantity" required />
+
+        <button type="submit">Add</button>
+    </form>
+</div>
+
+<!-- Product Movements -->
+<section id="">
+
+</section>
+
+<script>
+    function togglePanel() {
+        const panel = document.getElementById('add-product-panel');
+        const isOpen = panel.style.left === '0px';
+        panel.style.left = isOpen ? '-500px' : '0px';
+    }
+</script>
+
+<script src="{{url_for('static', filename='js/API/Product/AddProduct.js')}}"></script>
+<script src="{{url_for('static', filename='js/IndexView.js')}}"></script>

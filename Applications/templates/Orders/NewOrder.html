@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Place Order</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef2f5;
+        }
+        
+        section {
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        form {
+            width: 90vw;
+            max-width: 600px;
+            height: auto;
+            background-color: #ffffff;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            overflow-y: auto;
+        }
+        
+        h2 {
+            text-align: center;
+            margin-bottom: 24px;
+            color: #2c3e50;
+            font-size: 24px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 16px;
+            border: 1px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 14px;
+            background-color: #fdfdfd;
+        }
+        
+        input[readonly] {
+            background-color: #ecf0f1;
+            cursor: not-allowed;
+        }
+        
+        .row-group {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .row-item {
+            flex: 1;
+        }
+        
+        @media (max-width: 600px) {
+            .row-group {
+                flex-direction: column;
+            }
+        }
+        
+        .location-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .location-row>div {
+            flex: 1;
+        }
+        
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        .submit-btn {
+            background-color: #27ae60;
+            color: white;
+        }
+        
+        .submit-btn:hover {
+            background-color: #219150;
+        }
+        
+        .cancel-btn {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .cancel-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        @media (max-width: 500px) {
+            .location-row {
+                flex-direction: column;
+            }
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <section>
+        <form action="{{ url_for('neworder', username=warehouse.username, product_Name=warehouse.product_Name ) }}" method="post">
+            <h2>Place New Order</h2>
+
+            <div class="row-group">
+                <div class="row-item">
+                    <label for="warehouse-name">Warehouse Name</label>
+                    <input type="text" name="sellername" value="{{ warehouse.name }}" id="sellername" readonly>
+                </div>
+
+                <div class="row-item">
+                    <label for="warehouse-username">Username</label>
+                    <input type="text" name="sellerusername" value="@{{ warehouse.username }}" id="sellerusername" readonly>
+                </div>
+            </div>
+
+            <label for="product-name">Product Name</label>
+            <input type="text" name="productname" value="{{ warehouse.product_Name }}" id="productname" readonly>
+
+            <label for="product-price">Price</label>
+            <input type="number" name="productprice" value="{{ warehouse.product_Price }}" id="productprice" readonly>
+
+            <label for="product-quantity">Quantity</label>
+            <input type="number" id="productquantity" name="productquantity" placeholder=">={{warehouse.product_Quantity}}" min="1" max="{{ warehouse.product_Quantity}}" required>
+
+            <div class="location-row">
+                <div>
+                    <label for="from-location">From Location</label>
+                    <select id="from-location" name="sellerlocation" required>
+                        <option value="{{ warehouse.location }}" selected>{{ warehouse.location }}</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="to-location">To Location</label>
+                    <select id="to-location" name="buyerlocation" required></select>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="submit-btn">Place Order</button>
+                <button type="button" class="cancel-btn" onclick="window.location.href='/'">Cancel</button>
+            </div>
+        </form>
+    </section>
+
+    <script>
+        const LocationArray = ['A', 'B', 'C', 'D', 'E', 'F', 'Z', 'Y', 'X', 'W', 'V', 'U'];
+
+        const toSelect = document.getElementById("to-location");
+
+        const defaultTo = "{{ to_location.location }}";
+
+        LocationArray.forEach(loc => {
+            let opt2 = new Option(loc, loc, loc === defaultTo, loc === defaultTo);
+            toSelect.add(opt2);
+        });
+    </script>
+</body>
+
+</html>

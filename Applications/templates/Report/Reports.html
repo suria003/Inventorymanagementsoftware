@@ -1,0 +1,74 @@
+<main id="report-page" style="display:none !important; font-family:'Segoe UI', Tahoma, sans-serif; margin:0; padding:20px; background:#f4f7fb;">
+    <nav style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+        <h1 style="color:#0f4c81; font-size:28px; font-weight:700;">📊 Reports</h1>
+    </nav>
+
+    <section>
+        <div style="max-width:1200px; margin:0 auto; background:#fff; padding:30px; border-radius:12px; box-shadow:0 6px 20px rgba(0,0,0,0.08);">
+            <h2 style="text-align:start; font-size:22px; color:#0f4c81; margin-bottom:20px;">
+                📝 My Order History
+            </h2>
+
+            <a href="/" style="text-decoration: none;font-size: medium;color: white;background-color: black;padding: 5px 10px 5px 10px;border-radius: 5px;position: fixed;top: 5%;right: 3%;">Back</a> {% if orders and orders|length > 0 %}
+            <div style="overflow-x:auto; border-radius:10px;">
+                <table style="width:100%; border-collapse:collapse; font-size:15px; min-width:900px;">
+                    <thead>
+                        <tr style="background:#0f4c81; color:#fff; text-align:left;">
+                            <th style="padding:14px;">Order ID</th>
+                            <th style="padding:14px;">Product Name</th>
+                            <th style="padding:14px;">Quantity</th>
+                            <th style="padding:14px;">Status</th>
+                            <th style="padding:14px;">Ordered On</th>
+                            <th style="padding:14px;">Seller</th>
+                            <th style="padding:14px;">From</th>
+                            <th style="padding:14px;">Destination</th>
+                            <th style="padding:14px;">Initial Stock</th>
+                            <th style="padding:14px;">Issued Stock</th>
+                            <th style="padding:14px;">Total Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in orders %}
+                        <tr style="background:{% if loop.index is even %}#f9fcff{% else %}#ffffff{% endif %}; transition:all 0.2s ease-in-out;" onmouseover="this.style.background='#eaf3fc'" onmouseout="this.style.background='{% if loop.index is even %}#f9fcff{% else %}#ffffff{% endif %}'">
+
+                            <td style="padding:12px; border-bottom:1px solid #eaeaea;">{{ row.order_Id }}</td>
+                            <td style="padding:12px; border-bottom:1px solid #eaeaea;">{{ row.product_Name }}</td>
+                            <td style="padding:12px; border-bottom:1px solid #eaeaea;">{{ row.TotalQty }}</td>
+                            <td style="padding:12px; border-bottom:1px solid #eaeaea; font-weight:600; 
+                                       color:{% if row.status=='delivered' %}#27ae60{% elif row.status=='cancelled' %}#e74c3c{% else %}#f39c12{% endif %};">
+                                {{ row.status | capitalize }}
+                            </td>
+                            <td style="padding:12px; border-bottom:1px solid #eaeaea;">{{ row.ordered_By }}</td>
+                            <td style="padding:12px; border-bottom:1px solid #eaeaea;">{{ row.seller }}</td>
+                            <td style="padding:12px; border-bottom:1px solid #eaeaea;">{{ row.from_Location }}</td>
+                            <td style="padding:12px; border-bottom:1px solid #eaeaea;">{{ row.to_Location }}</td>
+                            <td style="padding:12px; border-bottom:1px solid #eaeaea;">{{ row.InitialQty }}</td>
+                            <td style="padding:12px; border-bottom:1px solid #eaeaea;">{{ row.IssuedQty }}</td>
+
+                            {% if row.status == 'delivery' %}
+                            <td style="padding:12px; border-bottom:1px solid #eaeaea; font-weight:600; color:#2980b9;">
+                                {{ row.TotalQty }}
+                            </td>
+                            {% elif row.status == 'canceled' %}
+                            <td style="padding:12px; border-bottom:1px solid #eaeaea; font-weight:600; color:#c0392b;">
+                                {{ row.InitialQty }}
+                            </td>
+                            {% else %}
+                            <td style="padding:12px; border-bottom:1px solid #eaeaea; color:#7f8c8d;">-</td>
+                            {% endif %}
+
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div style="text-align:center; margin-top:50px; font-size:16px; color:#c0392b; font-weight:500;">
+                ⚠️ You have no orders yet.
+            </div>
+            {% endif %}
+        </div>
+    </section>
+</main>
+
+<script src="{{ url_for('static', filename='js/IndexView.js') }}"></script>

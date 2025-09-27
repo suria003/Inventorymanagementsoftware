@@ -1,0 +1,366 @@
+<section id="order-page" style="margin-top:40px;display: none;">
+
+    <!-- Navigation -->
+    <nav style="margin-bottom:20px;">
+        <h2 style="margin-bottom:15px; font-size:1.5rem; color:#2c3e50;">Orders</h2>
+        <ul style="list-style:none; display:flex; gap:12px; padding:0; flex-wrap:wrap;">
+            <li>
+                <button onclick="window.location.href='/'" style="padding:10px 18px; border:none; border-radius:8px; cursor:pointer; font-weight:600; background:#3498db; color:#fff; transition:background 0.3s ease;">
+                New Orders
+            </button>
+            </li>
+            <li>
+                <button onclick="showSection('orders')" style="padding:10px 18px; border:none; border-radius:8px; cursor:pointer; font-weight:600; background:#3498db; color:#fff; transition:background 0.3s ease;">
+                My Orders
+            </button>
+            </li>
+            <li>
+                <button onclick="showSection('track')" style="padding:10px 18px; border:none; border-radius:8px; cursor:pointer; font-weight:600; background:#3498db; color:#fff; transition:background 0.3s ease;">
+                Delivered Orders
+            </button>
+            </li>
+            <li>
+                <button onclick="showSection('notifications')" style="padding:10px 18px; border:none; border-radius:8px; cursor:pointer; font-weight:600; background:#3498db; color:#fff; transition:background 0.3s ease;">
+                Order Notifications
+            </button>
+            </li>
+        </ul>
+    </nav>
+
+    {% if message %}
+    <div style="position: absolute;left: 50%;top: 50%;transform: translate(-50%, -50%); margin:20px auto; padding:15px; max-width:600px;
+            background:#ffe6e6; color:#c0392b; border:1px solid #e74c3c;
+            border-radius:8px; font-family:Arial, sans-serif;z-index: 1000;">
+        {{ message }}
+    </div>
+    {% endif %}
+
+    <!-- MY ORDERS -->
+    <section id="orders" style="width:100%; display:block; margin-bottom:20px; font-family:'Segoe UI', sans-serif;">
+        <h2 style="margin-bottom:16px; font-size:1.6rem; color:#2c3e50;">My Orders</h2>
+
+        {% for order in orders %}
+        <div style="background:#fff; border-radius:12px; box-shadow:0 6px 18px rgba(0,0,0,0.08); padding:20px; margin-bottom:16px;">
+            <div style="display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between;">
+
+                <div style="flex:1 1 100%; max-width:calc(50% - 16px); box-sizing:border-box;">
+                    <strong>Order ID:</strong><br><br>{{ order.order_Id }}
+                </div>
+
+                <div style="flex:1 1 100%; max-width:calc(50% - 16px); box-sizing:border-box;">
+                    <strong>Seller:</strong><br><br>{{ order.seller }}
+                </div>
+
+                <div style="flex:1 1 100%; max-width:calc(50% - 16px); box-sizing:border-box;">
+                    <strong>Status:</strong><br> {% set status = order.status.lower() %}
+                    <span style="margin-top:6px; display:inline-block; padding:6px 12px; border-radius:6px; font-weight:600; color:#fff; background-color:{% if status=='pending' %}#f39c12{% elif status=='placed' %}#27ae60{% elif status=='delivery' %}#2980b9{% elif status=='canceled' %}#c0392b{% else %}#7f8c8d{% endif %};">{{ order.status }}</span>
+                </div>
+                {% if order.status != 'canceled'%}
+                <div style="flex:1 1 100%; max-width:calc(50% - 16px); box-sizing:border-box;">
+                    <strong>Date&Time:</strong><br>
+                    <button onclick="showDateTime('{{ loop.index }}')" style="margin-top:6px; padding:8px 14px; border:none; border-radius:6px; background:#3498db; color:#fff; cursor:pointer;">View Date&Time</button>
+                </div>
+                {% else %}
+                <div style="flex:1 1 100%; max-width:calc(50% - 16px); box-sizing:border-box;">
+                    <strong>Order Canceled.</strong><br>
+                    <p>Not Available.</p>
+                </div>
+                {% endif %}
+
+                <div style="flex:1 1 100%; max-width:calc(50% - 16px); box-sizing:border-box;">
+                    <strong>Product:</strong><br>
+                    <button onclick="showModal('{{ loop.index }}')" style="margin-top:6px; padding:8px 14px; border:none; border-radius:6px; background:#3498db; color:#fff; cursor:pointer;">View Product</button>
+                </div>
+
+                <div style="flex:1 1 100%; max-width:calc(50% - 16px); box-sizing:border-box;">
+                    <strong>Location:</strong><br>
+                    <button onclick="showTrack('{{ loop.index }}')" style="margin-top:6px; padding:8px 14px; border:none; border-radius:6px; background:#3498db; color:#fff; cursor:pointer;">View Track</button>
+                </div>
+                <div style="flex:1 1 100%; max-width:calc(50% - 16px); box-sizing:border-box;">
+                    <strong>Edit:</strong><br> {% if order.status != 'canceled' and order.status != 'delivery' %}
+                    <a href="{{url_for('editTrack', movementId=order.movement_Id)}}" style="margin-top:6px; display:inline-block; padding:8px 14px; border-radius:6px; background:#3498db; color:#fff; text-decoration:none;">✏ Edit</a> {% else %}
+                    <p>Edit not Available.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Modal -->
+            <div id="modal-{{ loop.index }}" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
+                <div style="background:#fff; padding:24px; border-radius:12px; width:90%; max-width:420px; box-shadow:0 8px 24px rgba(0,0,0,0.2); position:relative;">
+                    <button onclick="closeModal('{{ loop.index }}')" style="position:absolute; top:12px; right:12px; font-size:24px; background:none; border:none; cursor:pointer; color:#666;">&times;</button>
+                    <h3 style="margin-top:0; color:#333;">Product Details</h3>
+                    <p><strong>Name:</strong> {{ order.product_Name }}</p>
+                    <p><strong>Price:</strong> ₹{{ order.product_Price }}</p>
+                    <p><strong>Quantity:</strong> {{ order.product_Qty }}</p>
+                    <p><strong>Total:</strong> ₹{{ order.product_Price * order.product_Qty }}</p>
+                </div>
+            </div>
+
+            <!-- Track -->
+            <div id="track-{{ loop.index }}" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
+                <div style="position:relative; background:#fff; padding:20px; border-radius:10px; width:90%; max-width:200px; box-shadow:0 8px 20px rgba(0,0,0,0.2); display:flex; align-items:center; justify-content:center; gap:12px;">
+                    <button onclick="closeTrack('{{ loop.index }}')" style="position:absolute; top:10px; right:10px; font-size:22px; background:none; border:none; cursor:pointer; color:#888;">&times;</button>
+                    <div style="font-size:16px; font-weight:600; color:#333; display:flex; align-items:center;">
+                        <span style="font-size:20px; margin-right:5px;">📍</span> {{ order.from_Location }}
+                    </div>
+                    <div style="font-size:20px; color:#3498db; display:inline-block; animation:moveArrow 1.5s infinite;">➝➝➝</div>
+                    <div style="font-size:16px; font-weight:600; color:#333; display:flex; align-items:center;">
+                        <span style="font-size:20px; margin-right:5px;">📦</span> {{ order.to_Location }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date & Time -->
+            <div id="datetime-{{ loop.index }}" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
+                <div style="background:#fff; padding:24px; border-radius:12px; width:90%; max-width:420px; box-shadow:0 8px 24px rgba(0,0,0,0.2); position:relative;">
+                    <button onclick="closeDateTime('{{ loop.index }}')" style="position:absolute; top:12px; right:12px; font-size:24px; background:none; border:none; cursor:pointer; color:#666;">&times;</button>
+                    <h3 style="margin-top:0; color:#333;">Order Duration</h3>
+                    <p><strong>Ordered : </strong> {{ order.packed_time }}</p>
+                    <p><strong>Delivered : </strong> {{ order.delivery_time }}</p>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div style="text-align:center; padding:24px; color:#888;">No orders available.</div>
+        {% endfor %}
+    </section>
+
+    <!-- TRACK ORDERS -->
+    <section id="track" style="width:100%; display:none; margin-bottom:24px; font-family:'Segoe UI', sans-serif;">
+        <h2 style="margin-bottom:20px; font-size:1.6rem; color:#2c3e50; border-bottom:2px solid #eee; padding:0 14px 6px;">Delivery Orders</h2>
+
+        {% for order in orders %} {% if order.status == 'delivery' %}
+        <div style="background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.06); padding:20px; margin:0 14px 20px;">
+            <div style="display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; align-items:flex-start;">
+
+                <div style="flex:1 1 150px;">
+                    <strong>Order ID:</strong><br><br>{{ order.order_Id }}
+                </div>
+
+                <div style="flex:1 1 150px;">
+                    <strong>Product:</strong><br>
+                    <button onclick="showproductOder('{{ loop.index }}')" style="margin-top:6px; padding:8px 14px; border:none; border-radius:6px; background:#3498db; color:#fff; cursor:pointer;">View Product</button>
+                </div>
+
+                <div style="flex:1 1 150px;">
+                    <strong>Seller:</strong><br><br>{{ order.seller }}
+                </div>
+
+                <div style="flex:1 1 150px;">
+                    <strong>Delivery Date&Time:</strong><br><br>{{ order.delivery_time }}
+                </div>
+            </div>
+
+            <div id="trackproduct-{{ loop.index }}" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
+                <div style="background:#fff; padding:24px; border-radius:12px; width:90%; max-width:420px; box-shadow:0 8px 24px rgba(0,0,0,0.2); text-align:left; position:relative;">
+                    <button onclick="closeproductOder('{{ loop.index }}')" style="position:absolute; top:12px; right:12px; font-size:24px; background:none; border:none; cursor:pointer; color:#666;">&times;</button>
+                    <h3 style="margin-top:0; color:#333;">Product Details</h3>
+                    <p><strong>Name:</strong> {{ order.product_Name }}</p>
+                    <p><strong>Price:</strong> ₹{{ order.product_Price }}</p>
+                    <p><strong>Quantity:</strong> {{ order.product_Qty }}</p>
+                    <p><strong>Total:</strong> ₹{{ order.product_Price * order.product_Qty }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %} {% else %}
+        <div style="text-align:center; padding:24px; color:#888;">No orders to track.</div>
+        {% endfor %}
+    </section>
+
+    <!-- STATUS NOTIFICATIONS -->
+    <section id="notifications" style="width:100%; display:none; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 6px 18px rgba(0,0,0,0.08); font-family:'Segoe UI', sans-serif;">
+        <h2 style="margin-bottom:20px; font-size:1.6rem; color:#2c3e50; border-bottom:2px solid #eee; padding:0 14px 6px;">Order Notifications</h2>
+
+        {% for request in requests %}
+        <div style="background:#fff; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.06); padding:20px; margin:0 14px 20px;">
+            <div style="display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; align-items:flex-start;">
+
+                <div style="flex:1 1 150px;">
+                    <strong>Order ID:</strong><br>{{ request.order_Id }}
+                </div>
+
+                <div style="flex:1 1 150px;">
+                    <strong>Buyer :</strong><br>
+                    <button onclick="showbuyerRequest('{{ loop.index }}')" style="margin-top:6px; padding:8px 14px; border:none; border-radius:6px; background:#3498db; color:#fff; cursor:pointer;">View Buyer</button>
+                </div>
+
+                <div style="flex:1 1 150px;">
+                    <strong>Product:</strong><br>
+                    <button onclick="showproductRequest('{{ loop.index }}')" style="margin-top:6px; padding:8px 14px; border:none; border-radius:6px; background:#3498db; color:#fff; cursor:pointer;">View Product</button>
+                </div>
+
+                <div style="flex:1 1 150px;">
+                    <strong>Location:</strong><br>
+                    <button onclick="showRequestTrack('{{ loop.index }}')" style="margin-top:6px; padding:8px 14px; border:none; border-radius:6px; background:#3498db; color:#fff; cursor:pointer;">View Track</button>
+                </div>
+
+                <div style="flex:1 1 150px; position:relative;">
+                    <strong>Action:</strong><br>
+                    <div style="margin-top:6px; display:flex; gap:10px;">
+                        <a onclick="showConfirm('accept-{{ request.order_Id }}')" style="padding:8px 14px; border-radius:6px; background:#27ae60; color:#fff; text-decoration:none;">Accept</a>
+                        <a onclick="showConfirm('cancel-{{ request.order_Id }}')" style="padding:8px 14px; border-radius:6px; background:#c0392b; color:#fff; text-decoration:none;">Cancel</a>
+                    </div>
+                </div>
+
+                <!-- Accept Panel -->
+                <div id="accept-{{ request.order_Id }}" style="display:none; position:fixed; top:50%; left:50%;transform: translate(-50%, -50%); background:#000; color: white; border:1px solid #ccc; border-radius:8px; padding:12px; width:220px; box-shadow:0 4px 10px rgba(0,0,0,0.1); z-index:100;">
+                    <p style="margin:0 0 10px; font-size:14px;">Are you sure you want to accept this order?</p>
+                    <form method="POST" action="{{ url_for('accept') }}">
+                        <input type="hidden" name="orderId" value="{{ request.order_Id }}">
+                        <input type="hidden" name="productQty" value="{{ request.product_Qty }}">
+                        <div style="display:flex; justify-content:space-between;">
+                            <button type="submit" style="padding:6px 12px; background:#27ae60; color:#fff; border:none; border-radius:5px; cursor:pointer;">Yes</button>
+                            <button type="button" onclick="closeConfirm('accept-{{ request.order_Id }}')" style="padding:6px 12px; background:#c0392b; color:#fff; border:none; border-radius:5px; cursor:pointer;">No</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Cancel Panel -->
+                <div id="cancel-{{ request.order_Id }}" style="display:none; position:fixed; top:50%; left:50%;transform: translate(-50%, -50%); background:#000; color: white; border:1px solid #ccc; border-radius:8px; padding:12px; width:220px; box-shadow:0 4px 10px rgba(0,0,0,0.1); z-index:100;">
+                    <p style="margin:0 0 10px; font-size:14px;">Are you sure you want to cancel this order?</p>
+                    <form method="POST" action="{{ url_for('cancel') }}">
+                        <input type="hidden" name="orderId" value="{{ request.order_Id }}">
+                        <div style="display:flex; justify-content:space-between;">
+                            <button type="submit" style="padding:6px 12px; background:#c0392b; color:#fff; border:none; border-radius:5px; cursor:pointer;">Yes</button>
+                            <button type="button" onclick="closeConfirm('cancel-{{ request.order_Id }}')" style="padding:6px 12px; background:#27ae60; color:#fff; border:none; border-radius:5px; cursor:pointer;">No</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Buyer -->
+            <div id="buyerdetail-{{ loop.index }}" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
+                <div style="background:#fff; padding:24px; border-radius:12px; width:90%; max-width:420px; box-shadow:0 8px 24px rgba(0,0,0,0.2); position:relative;">
+                    <button onclick="closebuyerRequest('{{ loop.index }}')" style="position:absolute; top:12px; right:12px; font-size:24px; background:none; border:none; cursor:pointer; color:#666;">&times;</button>
+                    <h3 style="margin-top:0; color:#333;">Buyer Details</h3>
+                    <p><strong>Buyer Name:</strong> {{ request.name }}</p>
+                    <p><strong>Buyer Username:</strong> @{{ request.username }}</p>
+                    <p><strong>Buyer Location:</strong> {{ request.to_Location }}</p>
+                </div>
+            </div>
+
+            <!-- Modal -->
+            <div id="requestproduct-{{ loop.index }}" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
+                <div style="background:#fff; padding:24px; border-radius:12px; width:90%; max-width:420px; box-shadow:0 8px 24px rgba(0,0,0,0.2); position:relative;">
+                    <button onclick="closeproductRequest('{{ loop.index }}')" style="position:absolute; top:12px; right:12px; font-size:24px; background:none; border:none; cursor:pointer; color:#666;">&times;</button>
+                    <h3 style="margin-top:0; color:#333;">Product Details</h3>
+                    <p><strong>Name:</strong> {{ request.product_Name }}</p>
+                    <p><strong>Price:</strong> ₹{{ request.product_Price }}</p>
+                    <p><strong>Quantity:</strong> {{ request.product_Qty }}</p>
+                    <p><strong>Total:</strong> ₹{{ request.product_Price * request.product_Qty }}</p>
+                </div>
+            </div>
+
+            <!-- Track Modal -->
+            <div id="trackrequest-{{ loop.index }}" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000;">
+                <div style="position:relative; background:#fff; padding:20px; border-radius:10px; width:250px; height:75px; display:flex; align-items:center; justify-content:center; gap:12px; box-shadow:0 8px 20px rgba(0,0,0,0.2);">
+                    <button onclick="closeRequestTrack('{{ loop.index }}')" style="position:absolute; top:10px; right:10px; font-size:22px; background:none; border:none; cursor:pointer; color:#888;">&times;</button>
+                    <div style="font-size:16px; font-weight:600; color:#333; display:flex; align-items:center;">
+                        <span style="font-size:20px; margin-right:5px;">📍</span> {{ request.from_Location }}
+                    </div>
+                    <div style="font-size:20px; color:#3498db; display:inline-block; animation:moveArrow 1.5s infinite;">➝➝➝</div>
+                    <div style="font-size:16px; font-weight:600; color:#333; display:flex; align-items:center;">
+                        <span style="font-size:20px; margin-right:5px;">📦</span> {{ request.to_Location }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div style="text-align:center; padding:24px; color:#888;">No more order requests.</div>
+        {% endfor %}
+    </section>
+
+
+</section>
+
+<!-- Arrow animation keyframes -->
+<style>
+    @keyframes moveArrow {
+        0% {
+            opacity: 0.2;
+            transform: translateX(0);
+        }
+        50% {
+            opacity: 1;
+            transform: translateX(10px);
+        }
+        100% {
+            opacity: 0.2;
+            transform: translateX(0);
+        }
+    }
+</style>
+
+<script>
+    function showModal(index) {
+        document.getElementById('modal-' + index).style.display = 'flex';
+    }
+
+    function closeModal(index) {
+        document.getElementById('modal-' + index).style.display = 'none';
+    }
+
+    function showTrack(index) {
+        document.getElementById('track-' + index).style.display = 'flex';
+    }
+
+    function closeTrack(index) {
+        document.getElementById('track-' + index).style.display = 'none';
+    }
+
+    function showRequestTrack(index) {
+        document.getElementById('trackrequest-' + index).style.display = 'flex';
+    }
+
+    function closeRequestTrack(index) {
+        document.getElementById('trackrequest-' + index).style.display = 'none';
+    }
+
+    function showbuyerRequest(index) {
+        document.getElementById('buyerdetail-' + index).style.display = 'flex';
+    }
+
+    function closebuyerRequest(index) {
+        document.getElementById('buyerdetail-' + index).style.display = 'none';
+    }
+
+    function showproductOder(index) {
+        document.getElementById('trackproduct-' + index).style.display = 'flex';
+    }
+
+    function closeproductOder(index) {
+        document.getElementById('trackproduct-' + index).style.display = 'none';
+    }
+
+    function showproductRequest(index) {
+        document.getElementById('requestproduct-' + index).style.display = 'flex';
+    }
+
+    function closeproductRequest(index) {
+        document.getElementById('requestproduct-' + index).style.display = 'none';
+    }
+
+    function showDateTime(index) {
+        document.getElementById('datetime-' + index).style.display = 'flex';
+    }
+
+    function closeDateTime(index) {
+        document.getElementById('datetime-' + index).style.display = 'none';
+    }
+
+    function showSection(sectionId) {
+        ['orders', 'track', 'notifications'].forEach(id => {
+            document.getElementById(id).style.display = (id === sectionId) ? 'block' : 'none';
+        });
+    }
+
+    function showConfirm(id) {
+        document.getElementById(id).style.display = 'block';
+    }
+
+    function closeConfirm(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+</script>
+
+<script src="{{url_for('static', filename='js/IndexView.js')}}"></script>

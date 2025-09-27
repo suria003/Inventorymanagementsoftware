@@ -1,0 +1,58 @@
+<header id="index-header" style="display:flex;flex-direction:row;align-items:center;gap:16px;margin-top: 25px;">
+    <h1 id="page-title" style="margin:0;font-size:1.5rem;letter-spacing:0.2px;flex:0 0 auto;">Warehouse</h1>
+</header>
+
+<section id="index-page" style="display:block;background:#ffffff;border-radius:0;overflow:hidden;box-shadow:none;margin-top: 15px;">
+    <table id="inventory-table" role="table" aria-describedby="table-desc" style="width:100%;border-collapse:separate;border-spacing:0;table-layout:fixed;">
+        <thead style="background:linear-gradient(90deg,#3498db,#2b84c7);color:#fff;">
+            <tr role="row">
+                <th style="padding:16px 20px;text-align:left;font-weight:600;font-size:0.95rem;vertical-align:middle;width:160px;">
+                    Warehouse's
+                </th>
+                <th style="padding:16px 20px;text-align:left;font-weight:600;font-size:0.95rem;vertical-align:middle;">
+                    Product
+                </th>
+                <th style="padding:16px 20px;text-align:right;font-weight:600;font-size:0.95rem;vertical-align:middle;width:120px;">
+                    Quantity
+                </th>
+                <th style="padding:16px 20px;text-align:center;font-weight:600;font-size:0.95rem;vertical-align:middle;width:120px;">
+                    Order
+                </th>
+            </tr>
+        </thead>
+        <tbody style="background:#ffffff;">
+            {% for info in informations %} {% if info.product_Quantity > 0 %}
+            <tr role="row" class="data-row" style="border-bottom:1px solid #eee;transition:background .28s ease,transform .18s ease;">
+                <td class="username-cell" data-label="Warehouse" tabindex="0" style="position:relative;padding:16px 20px;vertical-align:middle;font-weight:500;cursor:default;">
+                    <span class="label" style="display:inline-block;z-index:2;">{{ info.name }}</span>
+                </td>
+
+                <td data-label="Product" style="padding:16px 20px;vertical-align:middle;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+                        <span class="product-name" style="display:inline-block;font-weight:600;color:#2c3e50;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:65%;">
+                            {{ info.product_Name }}
+                        </span>
+
+                        <button class="price-badge" type="button" aria-label="Price ₹{{ info.product_Price }}" style="background:#e74c3c;color:#fff;padding:6px 10px;border-radius:0;border:0;font-weight:600;font-size:0.9rem;cursor:default;box-shadow:none;">
+                            ₹{{ info.product_Price }}
+                        </button>
+                    </div>
+                </td>
+
+                <td class="qty" data-label="Quantity" style="padding:16px 20px;vertical-align:middle;text-align:right;font-weight:700;color:#2c3e50;">
+                    {{ info.product_Quantity }}
+                </td>
+
+                <td style="padding:16px 20px;vertical-align:middle;text-align:center;">
+                    <a class="order-btn" type="button" href="{{url_for('neworder', username=info.username, product_Name=info.product_Name)}}" style="background:linear-gradient(180deg,#2ecc71,#28b463);color:#fff;padding:8px 12px;border-radius:0;border:0;font-weight:700;cursor:pointer;box-shadow:none;text-decoration:none;">
+                        Order
+                    </a>
+                </td>
+            </tr>
+            {% endif %} {% endfor %}
+        </tbody>
+    </table>
+
+</section>
+
+<script src="{{url_for('static', filename='js/IndexView.js')}}"></script>
